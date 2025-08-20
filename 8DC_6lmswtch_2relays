@@ -1,0 +1,286 @@
+// Motor1 control pins
+const int IN1 = 22;
+const int IN2 = 23;
+const int ENA = 2;
+
+// Motor2 control pins
+const int IN3 = 25;
+const int IN4 = 24;
+const int ENB = 3;
+
+// Motor3 control pins
+const int IN5 = 28;
+const int IN6 = 29;
+const int ENC = 4;
+
+// Motor4 control pins
+const int IN7 = 30;
+const int IN8 = 31;
+const int END = 5;
+
+// Motor5 control pins
+const int IN9 = 32;
+const int IN10 = 33;
+const int ENE = 6;
+
+// Motor6 control pins
+const int IN11 = 34;
+const int IN12 = 35;
+const int ENF = 7;
+
+// Motor7 control pins
+const int IN13 = 36;
+const int IN14 = 37;
+const int ENG = 8;
+
+// Motor8 control pins
+const int IN15 = 38;
+const int IN16 = 39;
+const int ENH = 9;
+
+// New limit switches
+const int LIMIT_FWD_2 = 40;
+const int LIMIT_BWD_2 = 41;
+const int LIMIT_FWD_3 = 42;
+const int LIMIT_BWD_3 = 43;
+
+// Relay channels
+const int RELAY_CH1 = 44;
+const int RELAY_CH2 = 45;
+
+
+// Limit switch pins
+const int LIMIT_FWD = 27;
+const int LIMIT_BWD = 26;
+
+// Motor settings
+const int motorSpeed = 255;  
+const int stopTime = 10000;  
+const int initialDelay = 3000; 
+const int reverseDelay = 2000;
+
+void setup() {
+  // Motor1
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT); pinMode(ENA, OUTPUT);
+  // Motor2
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT); pinMode(ENB, OUTPUT);
+  // Motor3
+  pinMode(IN5, OUTPUT); pinMode(IN6, OUTPUT); pinMode(ENC, OUTPUT);
+  // Motor4
+  pinMode(IN7, OUTPUT); pinMode(IN8, OUTPUT); pinMode(END, OUTPUT);
+
+// Motor5 to Motor8
+pinMode(IN9, OUTPUT); pinMode(IN10, OUTPUT); pinMode(ENE, OUTPUT);
+
+pinMode(IN11, OUTPUT); pinMode(IN12, OUTPUT); pinMode(ENF, OUTPUT);
+
+pinMode(IN13, OUTPUT); pinMode(IN14, OUTPUT); pinMode(ENG, OUTPUT);
+
+pinMode(IN15, OUTPUT); pinMode(IN16, OUTPUT); pinMode(ENH, OUTPUT);
+
+// New limit switches
+pinMode(LIMIT_FWD_2, INPUT_PULLUP);
+pinMode(LIMIT_BWD_2, INPUT_PULLUP);
+pinMode(LIMIT_FWD_3, INPUT_PULLUP);
+pinMode(LIMIT_BWD_3, INPUT_PULLUP);
+
+// Relay channels
+pinMode(RELAY_CH1, OUTPUT);
+pinMode(RELAY_CH2, OUTPUT);
+
+// Limit switches
+  pinMode(LIMIT_FWD, INPUT_PULLUP);
+  pinMode(LIMIT_BWD, INPUT_PULLUP);
+  pinMode(LIMIT_FWD_2, INPUT_PULLUP);
+pinMode(LIMIT_BWD_2, INPUT_PULLUP);
+pinMode(LIMIT_FWD_3, INPUT_PULLUP);
+pinMode(LIMIT_BWD_3, INPUT_PULLUP);
+
+
+}
+
+void loop() {
+  // Motor2 runs continuously
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  analogWrite(ENB, motorSpeed);
+
+  // Delay before Motor1 starts
+  delay(initialDelay);
+
+  // Motor1 forward until LIMIT_FWD is triggered
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  analogWrite(ENA, motorSpeed);
+  while (digitalRead(LIMIT_FWD) == HIGH) {
+    delay(100);
+  }
+
+  // Stop Motor1
+  analogWrite(ENA, 0);
+
+  // Motor3 runs for 5 seconds
+  digitalWrite(IN5, HIGH);
+  digitalWrite(IN6, LOW);
+  analogWrite(ENC, motorSpeed);
+  delay(5000);
+  analogWrite(ENC, 0);
+
+  // Motor4 runs forward for 10 seconds
+  digitalWrite(IN7, HIGH);
+  digitalWrite(IN8, LOW);
+  analogWrite(END, motorSpeed);
+  delay(10000);
+  analogWrite(END, 0);
+
+  // Motor1 backward until LIMIT_BWD is triggered
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  analogWrite(ENA, motorSpeed);
+  while (digitalRead(LIMIT_BWD) == HIGH) {
+    delay(100);
+  }
+
+  // Stop Motor1
+  analogWrite(ENA, 0);
+
+  // Delay before Motor4 reverse
+  delay(reverseDelay);
+
+  // Motor4 reverse for 10 seconds
+  digitalWrite(IN7, LOW);
+  digitalWrite(IN8, HIGH);
+  analogWrite(END, motorSpeed);
+  delay(10000);
+  analogWrite(END, 0);
+
+  // After Motor1 backward till LIMIT_BWD
+analogWrite(ENA, 0);
+delay(5000);
+
+// Motor5 and Motor6 forward till LIMIT_FWD_2
+digitalWrite(IN9, HIGH); 
+digitalWrite(IN10, LOW); 
+analogWrite(ENE, motorSpeed);
+digitalWrite(IN11, HIGH); 
+digitalWrite(IN12, LOW); 
+analogWrite(ENF, motorSpeed);
+while (digitalRead(LIMIT_FWD_2) == HIGH) { delay(100); }
+analogWrite(ENE, 0); 
+analogWrite(ENF, 0);
+
+delay(10000);
+
+// Motor1 forward till LIMIT_FWD
+digitalWrite(IN1, HIGH); 
+digitalWrite(IN2, LOW); 
+analogWrite(ENA, motorSpeed);
+while (digitalRead(LIMIT_FWD) == HIGH) { delay(100); }
+analogWrite(ENA, 0);
+
+// Motor3 forward for 30 sec
+digitalWrite(IN5, HIGH); 
+digitalWrite(IN6, LOW); 
+analogWrite(ENC, motorSpeed);
+delay(30000);
+analogWrite(ENC, 0);
+
+delay(30000);
+
+// Stop Motor2
+analogWrite(ENB, 0);
+
+delay(20000);
+
+// Motor8 forward till LIMIT_FWD_3
+digitalWrite(IN15, HIGH); 
+digitalWrite(IN16, LOW); 
+analogWrite(ENH, motorSpeed);
+
+// Activate relay channels
+digitalWrite(RELAY_CH1, HIGH);  // LED ON
+digitalWrite(RELAY_CH2, HIGH);  // Blinking ON
+
+while (digitalRead(LIMIT_FWD_3) == HIGH) { delay(100); }
+analogWrite(ENH, 0);
+
+// Relay channel2 blinking for 1 min
+unsigned long blinkStart = millis();
+while (millis() - blinkStart < 60000) {
+  digitalWrite(RELAY_CH2, HIGH);
+  delay(500);
+  digitalWrite(RELAY_CH2, LOW);
+  delay(500);
+}
+// Stop blinking
+digitalWrite(RELAY_CH2, LOW);
+
+// Motor7 forward for 10 sec
+digitalWrite(IN13, HIGH); 
+digitalWrite(IN14, LOW); 
+analogWrite(ENG, motorSpeed);
+delay(10000);
+analogWrite(ENG, 0);
+
+delay(3000);
+
+// Motor2 resumes continuous
+digitalWrite(IN3, HIGH); 
+digitalWrite(IN4, LOW); 
+analogWrite(ENB, motorSpeed);
+
+// Motor5 and 6 reverse till LIMIT_BWD_2
+digitalWrite(IN9, LOW); 
+digitalWrite(IN10, HIGH); 
+analogWrite(ENE, motorSpeed);
+digitalWrite(IN11, LOW); 
+digitalWrite(IN12, HIGH); 
+analogWrite(ENF, motorSpeed);
+
+while (digitalRead(LIMIT_BWD_2) == HIGH) { delay(100); }
+analogWrite(ENE, 0); analogWrite(ENF, 0);
+
+// Motor7 reverse for 10 sec
+digitalWrite(IN13, LOW); 
+digitalWrite(IN14, HIGH); 
+analogWrite(ENG, motorSpeed);
+delay(10000);
+analogWrite(ENG, 0);
+
+// Motor8 reverse till LIMIT_BWD_3
+digitalWrite(IN15, LOW); 
+digitalWrite(IN16, HIGH); 
+analogWrite(ENH, motorSpeed);
+
+while (digitalRead(LIMIT_BWD_3) == HIGH) { delay(100); }
+analogWrite(ENH, 0);
+
+// Motor3 reverse for 10 sec
+digitalWrite(IN5, LOW); 
+digitalWrite(IN6, HIGH); 
+analogWrite(ENC, motorSpeed);
+delay(10000);
+analogWrite(ENC, 0);
+
+// Motor1 reverse till LIMIT_BWD
+digitalWrite(IN1, LOW); 
+digitalWrite(IN2, HIGH); 
+analogWrite(ENA, motorSpeed);
+
+while (digitalRead(LIMIT_BWD) == HIGH) { delay(100); }
+analogWrite(ENA, 0);
+
+// Motor3 reverse again for 10 sec
+digitalWrite(IN5, LOW); 
+digitalWrite(IN6, HIGH); 
+analogWrite(ENC, motorSpeed);
+delay(10000);
+analogWrite(ENC, 0);
+
+// Loop restarts
+delay(stopTime);
+
+
+  // Final delay before loop restarts
+  //delay(stopTime);
+}
