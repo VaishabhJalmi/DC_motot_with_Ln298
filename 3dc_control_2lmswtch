@@ -1,0 +1,102 @@
+// Motor1 control pins
+const int IN1 = 22;
+const int IN2 = 23;
+const int ENA = 2;
+
+// Motor2 control pins
+const int IN3 = 25;
+const int IN4 = 24;
+const int ENB = 3;
+
+// Motor3 control pins
+const int IN5 = 28;
+const int IN6 = 29;
+const int ENC = 4;
+
+// Motor4 control pins
+const int IN7 = 30;
+const int IN8 = 31;
+const int END = 5;
+
+// Limit switch pins
+const int LIMIT_FWD = 27;
+const int LIMIT_BWD = 26;
+
+// Motor settings
+const int motorSpeed = 255;
+const int stopTime = 10000;
+const int initialDelay = 3000;
+const int reverseDelay = 2000;
+
+void setup() {
+  // Motor1
+  pinMode(IN1, OUTPUT); pinMode(IN2, OUTPUT); pinMode(ENA, OUTPUT);
+  // Motor2
+  pinMode(IN3, OUTPUT); pinMode(IN4, OUTPUT); pinMode(ENB, OUTPUT);
+  // Motor3
+  pinMode(IN5, OUTPUT); pinMode(IN6, OUTPUT); pinMode(ENC, OUTPUT);
+  // Motor4
+  pinMode(IN7, OUTPUT); pinMode(IN8, OUTPUT); pinMode(END, OUTPUT);
+  // Limit switches
+  pinMode(LIMIT_FWD, INPUT_PULLUP);
+  pinMode(LIMIT_BWD, INPUT_PULLUP);
+}
+
+void loop() {
+  // Motor2 runs continuously
+  digitalWrite(IN3, HIGH);
+  digitalWrite(IN4, LOW);
+  analogWrite(ENB, motorSpeed);
+
+  // Delay before Motor1 starts
+  delay(initialDelay);
+
+  // Motor1 forward until LIMIT_FWD is triggered
+  digitalWrite(IN1, HIGH);
+  digitalWrite(IN2, LOW);
+  analogWrite(ENA, motorSpeed);
+  while (digitalRead(LIMIT_FWD) == HIGH) {
+    delay(100);
+  }
+
+  // Stop Motor1
+  analogWrite(ENA, 0);
+
+  // Motor3 runs for 5 seconds
+  digitalWrite(IN5, HIGH);
+  digitalWrite(IN6, LOW);
+  analogWrite(ENC, motorSpeed);
+  delay(5000);
+  analogWrite(ENC, 0);
+
+  // Motor4 runs forward for 10 seconds
+  digitalWrite(IN7, HIGH);
+  digitalWrite(IN8, LOW);
+  analogWrite(END, motorSpeed);
+  delay(10000);
+  analogWrite(END, 0);
+
+  // Motor1 backward until LIMIT_BWD is triggered
+  digitalWrite(IN1, LOW);
+  digitalWrite(IN2, HIGH);
+  analogWrite(ENA, motorSpeed);
+  while (digitalRead(LIMIT_BWD) == HIGH) {
+    delay(100);
+  }
+
+  // Stop Motor1
+  analogWrite(ENA, 0);
+
+  // Delay before Motor4 reverse
+  delay(reverseDelay);
+
+  // Motor4 reverse for 10 seconds
+  digitalWrite(IN7, LOW);
+  digitalWrite(IN8, HIGH);
+  analogWrite(END, motorSpeed);
+  delay(10000);
+  analogWrite(END, 0);
+
+  // Final delay before loop restarts
+  delay(stopTime);
+}
